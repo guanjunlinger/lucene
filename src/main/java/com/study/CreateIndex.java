@@ -14,11 +14,16 @@ public class CreateIndex {
     public static void main(String[] args) throws IOException {
         Directory directory = FSDirectory.open(Paths.get("index"));
         IndexWriter indexWriter = new IndexWriter(directory, new IndexWriterConfig());
-        Document document = new Document();
-        document.add(new TextField("name", "张三", Field.Store.NO));
-        document.add(new LongPoint("id", 1234));
-        document.add(new StringField("nickname", "冷太阳", Field.Store.YES));
-        indexWriter.addDocument(document);
+
+        for (int i = 0; i < 10; i++) {
+            Document document = new Document();
+            document.add(new TextField("name", "张三" + i, Field.Store.NO));
+            document.add(new LongPoint("id", i));
+            document.add(new StringField("nickname", "冷太阳" + i, Field.Store.YES));
+            document.add(new FloatDocValuesField("price", 50.1f * i));
+            document.add(new FloatPoint("price", 50.1f * i));
+            indexWriter.addDocument(document);
+        }
         indexWriter.close();
     }
 

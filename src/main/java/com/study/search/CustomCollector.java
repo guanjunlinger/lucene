@@ -49,7 +49,7 @@ public class CustomCollector extends SimpleCollector {
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
 
         CustomCollector customCollector = new CustomCollector();
-        indexSearcher.search(LongPoint.newExactQuery("id",1234),customCollector);
+        indexSearcher.search(LongPoint.newExactQuery("id",1),customCollector);
         for(ScoreDoc scoreDoc :customCollector.getTopDocs().scoreDocs){
             Document document = indexSearcher.doc(scoreDoc.doc);
             System.out.println(document.get("nickname"));
