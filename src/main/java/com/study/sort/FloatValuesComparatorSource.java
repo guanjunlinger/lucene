@@ -25,6 +25,9 @@ public class FloatValuesComparatorSource extends FieldComparatorSource {
 
         private float[] values;
         private float bottom;
+
+
+
         private float topValue;
 
         public MyFloatComparator(int numHits, String field, Float missingValue) {

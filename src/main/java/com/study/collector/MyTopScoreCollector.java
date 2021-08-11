@@ -1,4 +1,4 @@
-package com.study.search;
+package com.study.collector;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.LongPoint;
@@ -14,14 +14,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomCollector extends SimpleCollector {
+public class MyTopScoreCollector extends SimpleCollector {
     private int docBase;
     private Scorer scorer;
     private List<ScoreDoc> list = new ArrayList<>(16);
+    private float maxScores = 0.0f;
 
     @Override
     public void collect(int i) throws IOException {
         list.add(new ScoreDoc(docBase + i, scorer.score()));
+        maxScores = Math.max(maxScores, scorer.score());
     }
 
     @Override
@@ -39,8 +41,8 @@ public class CustomCollector extends SimpleCollector {
         return true;
     }
 
-    public TopFieldDocs getTopDocs() {
-        return new TopFieldDocs(list.size(), list.toArray(new ScoreDoc[0]), null, 1.0f);
+    public TopDocs getTopDocs() {
+        return new TopDocs(list.size(), list.toArray(new ScoreDoc[0]), maxScores);
     }
 
     public static void main(String[] args) throws IOException {
@@ -48,9 +50,9 @@ public class CustomCollector extends SimpleCollector {
         IndexReader indexReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
 
-        CustomCollector customCollector = new CustomCollector();
-        indexSearcher.search(LongPoint.newExactQuery("id",1),customCollector);
-        for(ScoreDoc scoreDoc :customCollector.getTopDocs().scoreDocs){
+        MyTopScoreCollector myTopScoreCollector = new MyTopScoreCollector();
+        indexSearcher.search(LongPoint.newExactQuery("id", 1), myTopScoreCollector);
+        for (ScoreDoc scoreDoc : myTopScoreCollector.getTopDocs().scoreDocs) {
             Document document = indexSearcher.doc(scoreDoc.doc);
             System.out.println(document.get("nickname"));
         }
